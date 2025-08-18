@@ -13,12 +13,8 @@ class Item(BaseModel):
     price: float
 
 # GET: 查詢所有項目
-@app.get("/items")
-def get_items():
-    sdfsdfsdf
-    sdfsdfsdf
-
-    sdfsdf
+@app.get("/gggg")
+def gggg():
     return {}
 
 
