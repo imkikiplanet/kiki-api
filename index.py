@@ -15,6 +15,16 @@ class Item(BaseModel):
 # GET: 查詢所有項目
 @app.get("/items")
 def get_items():
+    sdfsdfsdf
+    sdfsdfsdf
+
+    sdfsdf
+    return {}
+
+
+# GET: 查詢所有項目
+@app.get("/items")
+def get_items():
     return items
 
 # GET: 根據 ID 查詢單一項目
