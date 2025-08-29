@@ -23,6 +23,7 @@ docker logs CT_NAME
 # single
 ctop
 docker rmi IMAGE_NAME
+docker system prune -fa
 docker kill CT_NAME
 docker run CT_NAME
 docker exec -it CT_NAME bash # enter CT
