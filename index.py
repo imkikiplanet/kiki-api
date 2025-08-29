@@ -1,57 +1,60 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import datetime
 
 app = FastAPI()
 
-# 模擬資料庫
-items = {}
+# 啟用 CORS 政策，讓你的網頁可以呼叫 API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# 資料模型
-class Item(BaseModel):
-    name: str
-    description: str = None
-    price: float
+# 定義接收的資料模型
+class ZodiacRequest(BaseModel):
+    date: str
 
-# GET: 查詢所有項目
-@app.get("/gggg")
-def gggg():
-    return {}
+# 定義星座的日期區間，加上中文和 emoji
+zodiac_signs = {
+    '摩羯座 ♑': (1, 20),
+    '水瓶座 ♒': (2, 19),
+    '雙魚座 ♓': (3, 20),
+    '牡羊座 ♈': (4, 20),
+    '金牛座 ♉': (5, 20),
+    '雙子座 ♊': (6, 21),
+    '巨蟹座 ♋': (7, 22),
+    '獅子座 ♌': (8, 22),
+    '處女座 ♍': (9, 22),
+    '天秤座 ♎': (10, 23),
+    '天蠍座 ♏': (11, 21),
+    '射手座 ♐': (12, 21),
+}
 
+@app.post('/get_zodiac')
+def get_zodiac_sign(request: ZodiacRequest):
+    try:
+        birth_date = datetime.datetime.strptime(request.date, '%Y-%m-%d').date()
+        month = birth_date.month
+        day = birth_date.day
 
-# GET: 查詢所有項目
-@app.get("/items")
-def get_items():
-    return items
+        zodiac = "未知"
+        for sign, (start_month, start_day) in zodiac_signs.items():
+            if (month == start_month and day >= start_day) or \
+               (month == (start_month % 12 + 1) and day < start_day):
+                zodiac = sign
+                break
 
-# GET: 根據 ID 查詢單一項目
-@app.get("/items/{item_id}")
-def get_item(item_id: int):
-    if item_id not in items:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return items[item_id]
+        # 修正跨年判斷
+        if (month == 12 and day >= 22) or (month == 1 and day <= 19):
+            zodiac = '摩羯座 ♑'
+        elif (month == 11 and day >= 22) or (month == 12 and day <= 21):
+            zodiac = '射手座 ♐'
 
-# POST: 新增一個項目
-@app.post("/items/{item_id}")
-def create_item(item_id: int, item: Item):
-    if item_id in items:
-        raise HTTPException(status_code=400, detail="Item already exists")
-    items[item_id] = item
-    return item
+        return {"zodiac": zodiac}
 
-# PUT: 更新一個項目
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):
-    if item_id not in items:
-        raise HTTPException(status_code=404, detail="Item not found")
-    items[item_id] = item
-    return item
-
-# DELETE: 刪除一個項目
-@app.delete("/items/{item_id}")
-def delete_item(item_id: int):
-    if item_id not in items:
-        raise HTTPException(status_code=404, detail="Item not found")
-    del items[item_id]
-    return {"detail": "Item deleted"}
-
-
+    except ValueError:
+        raise HTTPException(status_code=400, detail="生日日期格式不正確")
