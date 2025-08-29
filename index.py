@@ -34,6 +34,10 @@ zodiac_signs = {
     '射手座 ♐': (12, 21),
 }
 
+@app.get('/test')
+def test():
+    return {":D": "ok"}
+
 @app.post('/get_zodiac')
 def get_zodiac_sign(request: ZodiacRequest):
     try:
